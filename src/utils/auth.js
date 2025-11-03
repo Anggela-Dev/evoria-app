@@ -1,0 +1,11 @@
+export const isLoggedIn = () => {
+  return localStorage.getItem("user") !== null;
+};
+
+export const loginUser = (userData) => {
+  localStorage.setItem("user", JSON.stringify(userData));
+};
+
+export const logoutUser = () => {
+  localStorage.removeItem("user");
+};
