@@ -1,43 +1,45 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import Navbar from "../components/Navbar";
+import React, { useState } from "react";
 
 function EventDetailPage() {
-  const { id } = useParams();
-  const [event, setEvent] = useState(null);
+  const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:5000/api/events`)
-      .then((res) => {
-        const found = res.data.find((e) => e.id === parseInt(id));
-        setEvent(found);
-      })
-      .catch((err) => console.error(err));
-  }, [id]);
+  const handleRegister = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/registration", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: 1,   // nanti bisa diganti user login
+          event_id: 1,  // event yang sedang dilihat
+        }),
+      });
 
-  if (!event) {
-    return <p className="text-center mt-5">Loading event details...</p>;
-  }
+      if (!response.ok) {
+        throw new Error("Gagal melakukan request");
+      }
+
+      const data = await response.json();
+      setMessage(data.message);
+    } catch (error) {
+      console.error(error);
+      setMessage("Terjadi kesalahan saat mendaftar.");
+    }
+  };
 
   return (
-    <>
-      <Navbar />
-      <div className="container mt-4">
-        <div className="card shadow border-0">
-          <div className="card-body">
-            <h3 className="fw-bold">{event.title}</h3>
-            <p className="text-muted">
-              📅 {event.date} | 📍 {event.location}
-            </p>
-            <hr />
-            <p>{event.description}</p>
-            <button className="btn btn-primary">Daftar Sekarang</button>
-          </div>
-        </div>
-      </div>
-    </>
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <h1>Workshop UI/UX Mastery</h1>
+      <p>Pelatihan interaktif seputar desain antarmuka dan UX.</p>
+      <button className="btn btn-primary" onClick={handleRegister}>
+        Daftar Sekarang
+      </button>
+
+      {message && (
+        <p className="mt-3 fw-semibold text-success">{message}</p>
+      )}
+    </div>
   );
 }
 

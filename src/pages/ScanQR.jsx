@@ -1,8 +1,7 @@
-// src/pages/Dashboard.jsx
 import React, { useState } from "react";
 import { QrReader } from "react-qr-reader";
 
-function Dashboard() {
+function ScanQR() {
   const [result, setResult] = useState("");
   const [confirmed, setConfirmed] = useState(false);
 
@@ -38,4 +37,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default ScanQR;

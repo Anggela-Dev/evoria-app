@@ -32,3 +32,42 @@
 .tab-item.active {
   color: #007bff;
 }
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #ffffff;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0;
+  z-index: 100;
+}
+
+.tab-item {
+  text-decoration: none;
+  color: #444;
+  font-weight: 500;
+  text-align: center;
+}
+
+.tab-item span {
+  display: block;
+  font-size: 12px;
+}
+
+.tab-item.active {
+  color: #007bff;
+}
+
+.btn-logout {
+  background: none;
+  border: none;
+  color: #e63946;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  color: #c1121f;
+}
