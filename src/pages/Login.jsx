@@ -7,7 +7,7 @@ function Login() {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.type]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleLogin = async (e) => {
@@ -19,16 +19,16 @@ function Login() {
         body: JSON.stringify(form),
       });
 
-      const data = await res.json(); // ✅ definisikan data di sini
+      const data = await res.json();
 
       if (data.success) {
-  localStorage.setItem("user", JSON.stringify(data.user));
-  if (data.user.role === "admin") {
-    navigate("/admin");
-  } else {
-    navigate("/");
-  }
-}
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        if (data.user.role === "admin") navigate("/admin");
+        else navigate("/");
+      } else {
+        setMessage(data.message);
+      }
 
     } catch (err) {
       console.error(err);
@@ -42,18 +42,22 @@ function Login() {
       <form className="mx-auto" style={{ maxWidth: "400px" }} onSubmit={handleLogin}>
         <input
           type="email"
+          name="email"
           className="form-control mb-3"
           placeholder="Email"
           value={form.email}
           onChange={handleChange}
         />
+
         <input
           type="password"
+          name="password"
           className="form-control mb-3"
           placeholder="Password"
           value={form.password}
           onChange={handleChange}
         />
+
         <button className="btn btn-primary w-100 mb-3">Login</button>
         {message && <p className="text-danger">{message}</p>}
         <p>

@@ -11,8 +11,8 @@ function AdminTabBar({ setUser }) {
 
   return (
     <nav className="tabbar">
-      <NavLink to="/admin" className="tab-item">
-        🏠 <span>Dashboard</span>
+      <NavLink to="/admin" className="tab-item"> 
+      📊 <span>dashboard</span>
       </NavLink>
       <NavLink to="/admin/events" className="tab-item">
         📅 <span>Events</span>

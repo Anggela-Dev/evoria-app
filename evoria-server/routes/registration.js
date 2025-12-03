@@ -60,8 +60,9 @@ router.get("/:userId", (req, res) => {
     }
 
     if (results.length === 0) {
-      return res.json({ message: "Belum ada event yang kamu ikuti.", data: [] });
-    }
+  return res.json([]);
+}
+
 
     res.json(results);
   });
@@ -116,5 +117,6 @@ router.delete("/:userId/:eventId", (req, res) => {
     res.json({ message: "✅ Pendaftaran event berhasil dibatalkan!" });
   });
 });
+
 
 export default router;

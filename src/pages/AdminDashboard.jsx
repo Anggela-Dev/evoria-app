@@ -1,114 +1,108 @@
 import React, { useEffect, useState } from "react";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend
+} from "chart.js";
 
-function AdminDashboard() {
-  const [registrations, setRegistrations] = useState([]);
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+
+export default function AdminDashboard() {
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedEvent, setSelectedEvent] = useState("");
+
+  const userId = localStorage.getItem("user_id"); // ID Admin yang login
 
   useEffect(() => {
-    fetchRegistrations();
-  }, [selectedEvent]);
+    fetchData();
+  }, []);
 
-  const fetchRegistrations = async () => {
+  const fetchData = async () => {
     try {
-      const url = selectedEvent
-        ? `http://localhost:5000/api/registration/event/${selectedEvent}`
-        : "http://localhost:5000/api/registration";
-      const res = await fetch(url);
+      const res = await fetch(`http://localhost:5000/api/admin/dashboard?user_id=${userId}`);
       const data = await res.json();
-      setRegistrations(data);
+
+      if (!Array.isArray(data)) {
+        console.error("❌ API tidak mengembalikan array:", data);
+        return;
+      }
+
+      setEvents(data);
     } catch (error) {
-      console.error("❌ Gagal ambil data registrasi:", error);
+      console.error("Gagal load dashboard:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePromote = async (eventId) => {
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/registration/promote/${eventId}`,
-        { method: "PUT" }
-      );
-      const data = await res.json();
-      alert(data.message);
-      fetchRegistrations();
-    } catch (err) {
-      console.error("❌ Gagal mempromosikan:", err);
-    }
-  };
-
   return (
     <div className="container py-4">
-      <h2 className="fw-bold mb-4 text-center">🧑‍💼 Admin Dashboard</h2>
 
-      {/* Filter event ID */}
-      <div className="mb-3 d-flex justify-content-center">
-        <input
-          type="text"
-          className="form-control w-50"
-          placeholder="Masukkan Event ID (opsional)"
-          value={selectedEvent}
-          onChange={(e) => setSelectedEvent(e.target.value)}
-        />
-        <button className="btn btn-primary ms-2" onClick={fetchRegistrations}>
-          🔍 Cari
-        </button>
+      <h2 className="fw-bold text-center mb-4">📊 Admin Dashboard</h2>
+
+      {/* =================== CHART =================== */}
+      {!loading && events.length > 0 && (
+        <div className="mb-5 shadow p-4 rounded" style={{ height: "400px" }}>
+          <h4 className="text-center mb-4">📈 Grafik Jumlah Registrasi per Event</h4>
+
+          <Bar
+            data={{
+              labels: events.map(e => e.title),
+              datasets: [{
+                label: "Total Registrasi",
+                data: events.map(e => e.total_registrations),
+                backgroundColor: "rgba(54,162,235,0.6)"
+              }]
+            }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { position: "top" }
+              },
+              scales: {
+                x: { ticks: { autoSkip: false, maxRotation: 30 }},
+                y: { beginAtZero: true }
+              }
+            }}
+          />
+        </div>
+      )}
+
+      {/* =================== TABLE =================== */}
+      <div className="shadow p-3 rounded">
+        <h4 className="mb-3">📄 Detail Event yang Kamu Buat</h4>
+
+        {loading ? (
+          <p>Loading...</p>
+        ) : events.length === 0 ? (
+          <p className="text-muted">Belum ada event yang kamu buat.</p>
+        ) : (
+          <table className="table table-bordered table-striped">
+            <thead className="table-primary">
+              <tr>
+                <th>#</th>
+                <th>Nama Event</th>
+                <th>Total Registrasi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {events.map((e, i) => (
+                <tr key={e.id}>
+                  <td>{i + 1}</td>
+                  <td>{e.title}</td>
+                  <td>{e.total_registrations}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
-      {loading ? (
-        <p className="text-center text-muted">Memuat data...</p>
-      ) : registrations.length === 0 ? (
-        <p className="text-center text-muted">
-          Belum ada data registrasi ditemukan.
-        </p>
-      ) : (
-        <table className="table table-bordered table-striped">
-          <thead className="table-primary">
-            <tr>
-              <th>#</th>
-              <th>Nama Peserta</th>
-              <th>Email</th>
-              <th>Event ID</th>
-              <th>Status</th>
-              <th>Tindakan</th>
-            </tr>
-          </thead>
-          <tbody>
-            {registrations.map((reg, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{reg.username || "-"}</td>
-                <td>{reg.email || "-"}</td>
-                <td>{reg.event_id}</td>
-                <td>
-                  <span
-                    className={`badge ${
-                      reg.status === "confirmed"
-                        ? "bg-success"
-                        : "bg-warning text-dark"
-                    }`}
-                  >
-                    {reg.status}
-                  </span>
-                </td>
-                <td>
-                  {reg.status === "waitlist" && (
-                    <button
-                      onClick={() => handlePromote(reg.event_id)}
-                      className="btn btn-outline-success btn-sm"
-                    >
-                      ⬆️ Promote
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
     </div>
   );
 }
-
-export default AdminDashboard;

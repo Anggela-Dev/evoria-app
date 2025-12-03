@@ -6,106 +6,89 @@ function Home() {
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Semua");
+  const [sortType, setSortType] = useState("Terbaru");
   const navigate = useNavigate();
 
+  // ================= Format tanggal lokal Indonesia =================
+  function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString("id-ID", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+  }
+
+  // ================= Fetch Data =================
   useEffect(() => {
-    // ambil dari server dulu, kalau gagal -> fallback ke dummy
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/events");
-        if (!res.ok) throw new Error("Server offline");
+        const res = await fetch("http://localhost:5000/api/events/public/all");
+        if (!res.ok) throw new Error("Server Offline");
+
         const data = await res.json();
         setEvents(data);
         setFilteredEvents(data);
-      } catch {
-        // fallback dummy data
-        const dummyEvents = [
-          {
-            id: 1,
-            title: "Workshop UI/UX Design",
-            date: "2025-11-10",
-            location: "Lab Multimedia",
-            category: "Workshop",
-            description:
-              "Pelatihan interaktif tentang prinsip desain antarmuka modern untuk aplikasi mobile dan website.",
-          },
-          {
-            id: 2,
-            title: "Tech Talk: Future of AI",
-            date: "2025-11-15",
-            location: "Aula Utama",
-            category: "Seminar",
-            description:
-              "Diskusi mendalam seputar perkembangan Artificial Intelligence di tahun 2025 dan dampaknya terhadap industri.",
-          },
-          {
-            id: 3,
-            title: "Startup Pitch Day",
-            date: "2025-11-20",
-            location: "Auditorium Kampus",
-            category: "Kompetisi",
-            description:
-              "Ajang kompetisi startup antar mahasiswa dengan dewan juri dari pelaku industri teknologi.",
-          },
-          {
-            id: 4,
-            title: "Web Development Bootcamp",
-            date: "2025-11-25",
-            location: "Lab Riset Informatika",
-            category: "Workshop",
-            description:
-              "Bootcamp intensif membangun aplikasi web modern menggunakan React dan Node.js.",
-          },
-          {
-            id: 5,
-            title: "Festival Musik Kampus",
-            date: "2025-12-01",
-            location: "Lapangan Utama",
-            category: "Hiburan",
-            description:
-              "Pertunjukan musik tahunan yang menampilkan band dan penyanyi dari berbagai fakultas.",
-          },
-        ];
-        setEvents(dummyEvents);
-        setFilteredEvents(dummyEvents);
+      } catch (err) {
+        console.log("Fetch error:", err);
       }
     };
     fetchData();
   }, []);
 
-  // Fungsi filter berdasarkan kategori & search
+  // ================= Filter & Search & Sort =================
   useEffect(() => {
-    let data = events;
+    let data = [...events];
 
-    // filter kategori
+    // Filter kategori
     if (selectedCategory !== "Semua") {
-      data = data.filter((ev) => ev.category === selectedCategory);
+      data = data.filter(ev =>
+        ev.category?.trim().toLowerCase() === selectedCategory.toLowerCase()
+      );
     }
 
-    // filter pencarian
+    // Search by title
     if (searchTerm.trim() !== "") {
-      data = data.filter((ev) =>
+      data = data.filter(ev =>
         ev.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
+    // Sorting
+    if (sortType === "Terbaru") {
+      data.sort((a, b) => new Date(b.date) - new Date(a.date));
+    } else if (sortType === "Terlama") {
+      data.sort((a, b) => new Date(a.date) - new Date(b.date));
+    } else if (sortType === "Terdekat") {
+      data.sort((a, b) => Math.abs(new Date(a.date) - new Date()) - Math.abs(new Date(b.date) - new Date()));
+    }
+
     setFilteredEvents(data);
-  }, [searchTerm, selectedCategory, events]);
+  }, [searchTerm, selectedCategory, sortType, events]);
+
+  // ================= Dynamic Badge Color =================
+  const badgeColor = (cat) => {
+    switch (cat) {
+      case "Seminar": return "bg-primary";
+      case "Workshop": return "bg-success";
+      case "Kompetisi": return "bg-danger";
+      case "Hiburan": return "bg-warning text-dark";
+      default: return "bg-secondary";
+    }
+  };
 
   return (
     <div className="container py-4 mb-5">
+
       {/* Header */}
       <div className="text-center mb-4">
-        <h2 className="fw-bold" style={{ color: "#007bff" }}>
-          Evoria
-        </h2>
-        <p className="text-muted mb-1">
-          Kelola & temukan acara kampus dengan mudah 🔥
-        </p>
+        <h2 className="fw-bold text-primary">Evoria</h2>
+        <p className="text-muted">Temukan & kelola event kampus dengan mudah 🔥</p>
       </div>
 
-      {/* Filter & Search */}
-      <div className="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+      {/* Search & Filter & Sort */}
+      <div className="d-flex flex-wrap gap-2 justify-content-between mb-4">
+
         <input
           type="text"
           className="form-control"
@@ -117,7 +100,7 @@ function Home() {
 
         <select
           className="form-select"
-          style={{ maxWidth: "200px" }}
+          style={{ maxWidth: "180px" }}
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
         >
@@ -127,25 +110,46 @@ function Home() {
           <option value="Kompetisi">Kompetisi</option>
           <option value="Hiburan">Hiburan</option>
         </select>
+
+        <select
+          className="form-select"
+          style={{ maxWidth: "180px" }}
+          value={sortType}
+          onChange={(e) => setSortType(e.target.value)}
+        >
+          <option value="Terbaru">Terbaru</option>
+          <option value="Terlama">Terlama</option>
+          <option value="Terdekat">Terdekat</option>
+        </select>
       </div>
 
       {/* Event List */}
       <div className="row">
         {filteredEvents.map((event) => (
-          <div key={event.id} className="col-md-4 col-sm-6 mb-4">
-            <div className="card shadow-sm border-0 h-100">
-              <div className="card-body text-start">
-                <h5 className="card-title fw-semibold">{event.title}</h5>
-                <p className="card-text text-muted mb-1">📅 {event.date}</p>
-                <p className="card-text text-muted">📍 {event.location}</p>
-                <p className="card-text">
-                  <span className="badge bg-primary">{event.category}</span>
-                </p>
+          <div key={event.id} className="col-lg-4 col-md-6 mb-4">
+            <div className="card border-0 shadow-sm h-100"
+              style={{
+                backdropFilter: "blur(10px)",
+                background: "rgba(255,255,255,0.85)",
+                transition: "0.2s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = "scale(1.02)"}
+              onMouseLeave={e => e.currentTarget.style.transform = "scale(1.0)"}
+            >
+              <div className="card-body">
+                <h5 className="fw-bold">{event.title}</h5>
+                <p className="text-muted mb-1">📅 {formatDate(event.date)}</p>
+                <p className="text-muted">📍 {event.location}</p>
+
+                <span className={`badge ${badgeColor(event.category)}`}>
+                  {event.category}
+                </span>
+
                 <button
-                  className="btn btn-outline-primary w-100"
+                  className="btn btn-primary w-100 mt-3"
                   onClick={() => navigate(`/event/${event.id}`)}
                 >
-                  View Details
+                  Lihat Detail
                 </button>
               </div>
             </div>
@@ -153,10 +157,9 @@ function Home() {
         ))}
       </div>
 
-      {/* Empty State */}
       {filteredEvents.length === 0 && (
-        <div className="text-center text-muted mt-5">
-          <p>Event tidak ditemukan 😅</p>
+        <div className="text-center mt-5 text-muted">
+          <h5>Tidak ada event ditemukan 😅</h5>
         </div>
       )}
     </div>

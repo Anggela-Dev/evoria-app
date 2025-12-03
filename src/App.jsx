@@ -13,6 +13,8 @@ import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminEvents from "./pages/AdminEvents";
 import AdminTabBar from "./components/AdminTabBar";
+import AdminEventDetail from "./pages/AdminEventDetail";
+import AttendancePage from "./pages/AttendancePage";
 
 
 function App() {
@@ -32,6 +34,8 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/myevents" element={<MyEvents />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/admin/event/:id" element={<AdminEventDetail />} />
+          <Route path="/admin/events/:id/attendance" element={<AttendancePage />} />
 
           {/* Protected routes */}
           <Route
