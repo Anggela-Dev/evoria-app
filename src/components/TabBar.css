@@ -1,73 +1,102 @@
+/* ===== Floating Pill Wrapper ===== */
+.tabbar-wrapper {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none; /* biar area luar pill bisa klik */
+}
+
+/* ===== The Floating Pill Navbar ===== */
+.tabbar-pill {
+  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-radius: 40px;
+  padding: 10px 20px;
+  display: flex;
+  gap: 25px;
+  align-items: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  transition: 0.3s ease;
+}
+
+/* ===== Items ===== */
+.tab-item {
+  text-decoration: none;
+  color: #333;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: 0.25s ease;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 6px 10px;
+}
+
+/* Hover: ngembang */
+.tab-item:hover {
+  transform: scale(1.15);
+  background: rgba(0,0,0,0.05);
+}
+
+/* Active (halaman sedang dibuka) */
+.tab-item.active {
+  color: #0066ff;
+  transform: scale(1.15);
+}
+
+/* Logout button */
+.logout-btn {
+  background: none;
+  border: none;
+  color: #e63946;
+}
+
+.logout-btn:hover {
+  transform: scale(1.15);
+  background: rgba(255,0,0,0.08);
+}
 .tabbar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
-  background: #fff;
+  background: white;
   border-top: 1px solid #ddd;
   display: flex;
   justify-content: space-around;
-  align-items: center;
-  z-index: 9999;
-}
-
-.tab-item {
-  text-align: center;
-  flex: 1;
-  text-decoration: none;
-  color: #777;
-  font-size: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.tab-item span {
-  font-size: 12px;
-  margin-top: 2px;
-}
-
-.tab-item.active {
-  color: #007bff;
-}
-.tabbar {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #ffffff;
-  border-top: 1px solid #ddd;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 8px 0;
+  padding: 10px 0;
   z-index: 100;
 }
 
 .tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #888;
   text-decoration: none;
-  color: #444;
+  font-size: 14px;
   font-weight: 500;
-  text-align: center;
 }
 
 .tab-item span {
-  display: block;
   font-size: 12px;
 }
 
 .tab-item.active {
   color: #007bff;
+  font-weight: 600;
 }
 
-.btn-logout {
-  background: none;
+.logout-btn {
   border: none;
-  color: #e63946;
+  background: transparent;
+  color: #d9534f;
   cursor: pointer;
-}
-
-.btn-logout:hover {
-  color: #c1121f;
 }

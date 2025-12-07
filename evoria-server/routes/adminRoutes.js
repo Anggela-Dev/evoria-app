@@ -3,7 +3,7 @@ import db from "../db.js";
 
 const router = express.Router();
 
-// Dashboard Event sesuai Admin Pembuat
+/* Dashboard Event berdasarkan creator/admin */
 router.get("/dashboard", (req, res) => {
   const { user_id } = req.query;
 

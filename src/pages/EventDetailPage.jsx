@@ -43,7 +43,7 @@ function EventDetailPage() {
 
   if (!event) return <p className="text-center mt-5">Loading...</p>;
 
-  // Format tanggal & waktu biar tidak muncul Txxxxx
+  // Format tanggal & waktu
   const formattedDate = new Date(event.date).toLocaleDateString("id-ID", {
     day: "2-digit",
     month: "long",
@@ -59,42 +59,83 @@ function EventDetailPage() {
 
   return (
     <div className="container my-5 d-flex justify-content-center">
-      <div className="card shadow-lg p-4" style={{ maxWidth: "650px", width: "100%" }}>
-        
-        {/* Jika ada gambar event */}
-        {event.image && (
-          <img
-            src={event.image}
-            alt="Banner Event"
-            className="img-fluid rounded mb-3"
-            style={{ height: "260px", objectFit: "cover" }}
-          />
-        )}
-
-        <h2 className="fw-bold text-center">{event.title}</h2>
-
-        <div className="text-center text-muted mb-3">
-          <p>📅 {formattedDate}</p>
-          <p>🕒 {formattedTime}</p>
-          <p>📍 {event.location}</p>
-        </div>
-
-        <p className="pt-2 text-secondary" style={{ lineHeight: "1.7" }}>
-          {event.description}
-        </p>
-
-        <div className="d-flex flex-column align-items-center">
-          <button
-            className="btn btn-primary mt-3 px-4 py-2"
-            style={{ fontSize: "16px" }}
-            onClick={handleRegister}
-          >
-            Daftar Sekarang 🚀
-          </button>
-
-          {message && (
-            <p className="mt-3 fw-semibold text-success">{message}</p>
+      <div
+        className="shadow-lg"
+        style={{
+          maxWidth: "650px",
+          width: "100%",
+          borderRadius: "16px",
+          padding: "3px", // untuk gradient border
+          backgroundImage: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+          transition: "0.3s",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+      >
+        <div
+          className="card-body"
+          style={{
+            borderRadius: "14px",
+            background: "rgba(255,255,255,0.85)",
+            backdropFilter: "blur(12px)",
+            padding: "24px",
+          }}
+        >
+          {/* Banner Event */}
+          {event.image && (
+            <img
+              src={event.image}
+              alt="Banner Event"
+              className="img-fluid rounded mb-4"
+              style={{ height: "260px", objectFit: "cover" }}
+            />
           )}
+
+          <h2 className="fw-bold text-center mb-3">{event.title}</h2>
+
+          <div className="text-center text-muted mb-3" style={{ lineHeight: "1.6" }}>
+            <p>📅 {formattedDate}</p>
+            <p>🕒 {formattedTime}</p>
+            <p>📍 {event.location}</p>
+          </div>
+
+          <p className="text-secondary mb-4" style={{ lineHeight: "1.7" }}>
+            {event.description}
+          </p>
+
+          <div className="d-flex flex-column align-items-center">
+            <button
+              style={{
+                background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                border: "none",
+                color: "white",
+                fontWeight: "600",
+                fontSize: "16px",
+                borderRadius: "12px",
+                padding: "12px 24px",
+                cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(59,130,246,0.4)",
+                transition: "0.25s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = "linear-gradient(135deg, #2563eb, #7c3aed)";
+                e.target.style.transform = "translateY(-2px)";
+                e.target.style.boxShadow = "0 6px 16px rgba(124,58,237,0.55)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = "linear-gradient(135deg, #3b82f6, #8b5cf6)";
+                e.target.style.transform = "translateY(0)";
+                e.target.style.boxShadow = "0 4px 12px rgba(59,130,246,0.4)";
+              }}
+              onClick={handleRegister}
+            >
+              Daftar Sekarang 🚀
+            </button>
+
+            {message && (
+              <p className="mt-3 fw-semibold text-success text-center">{message}</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -8,12 +8,7 @@ function MyEvents() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user?.id;
-console.log("USER LOCALSTORAGE:", user);
-console.log("USER ID:", userId);
 
-  /* ============================================================
-     1) Ambil daftar event user
-  ============================================================ */
   const fetchMyEvents = async () => {
     try {
       const res = await fetch(`http://localhost:5000/api/registration/${userId}`);
@@ -33,10 +28,6 @@ console.log("USER ID:", userId);
     }
   };
 
-  /* ============================================================
-     2) Ambil semua event_id yang sudah dipresensi user
-     Backend return contoh: [1,3,5]
-  ============================================================ */
   const fetchAttendanceStatus = async () => {
     try {
       const res = await fetch(
@@ -44,21 +35,17 @@ console.log("USER ID:", userId);
       );
 
       const attended = await res.json();
-if (Array.isArray(attended)) {
-  setAttendedEvents(new Set(attended));
-} else {
-  console.warn("Format tidak sesuai, isi:", attended);
-  setAttendedEvents(new Set());
-}
 
+      if (Array.isArray(attended)) {
+        setAttendedEvents(new Set(attended));
+      } else {
+        setAttendedEvents(new Set());
+      }
     } catch (err) {
       console.error("Gagal ambil status presensi:", err);
     }
   };
 
-  /* ============================================================
-     3) Load awal
-  ============================================================ */
   useEffect(() => {
     const load = async () => {
       await fetchMyEvents();
@@ -68,9 +55,6 @@ if (Array.isArray(attended)) {
     load();
   }, []);
 
-  /* ============================================================
-     4) Batalkan event
-  ============================================================ */
   const handleCancel = async (eventId) => {
     try {
       const res = await fetch(
@@ -91,30 +75,58 @@ if (Array.isArray(attended)) {
     }
   };
 
-  /* ============================================================
-     5) UI Render
-  ============================================================ */
   return (
-    <div className="container py-4">
-      <h3 className="mb-4 fw-bold text-center">🎟️ My Registered Events</h3>
+    <div className="container py-4 mb-5">
+      <h3 className="fw-bold text-center mb-4">🎟️ My Registered Events</h3>
 
       {events.length === 0 ? (
-        <p className="text-center text-muted">
-          Belum ada event yang kamu daftar 😅
-        </p>
+        <p className="text-center text-muted">Belum ada event yang kamu daftar 😅</p>
       ) : (
         <div className="row">
           {events.map((event) => {
             const sudahPresensi = attendedEvents.has(event.id);
 
             return (
-              <div key={event.id} className="col-md-4 mb-4">
-                <div className="card shadow-sm h-100">
-                  <div className="card-body">
-                    <h5 className="card-title">{event.title}</h5>
-<p className="text-muted mb-1">
-  📅 {new Date(event.date).toLocaleDateString("id-ID", { day: '2-digit', month: 'long', year: 'numeric' })}
-</p>
+              <div key={event.id} className="col-lg-4 col-md-6 mb-4">
+                <div
+                  className="card border-0 shadow-sm h-100"
+                  style={{
+                    backdropFilter: "blur(10px)",
+                    background: "rgba(255,255,255,0.85)",
+                    transition: "0.25s",
+                    padding: "2px",
+                    backgroundImage: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.transform = "scale(1.03)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.transform = "scale(1.0)")
+                  }
+                >
+                  <div
+                    className="card-body"
+                    style={{
+                      borderRadius: "10px",
+                      background: "rgba(255,255,255,0.85)",
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      padding: "16px",
+                    }}
+                  >
+                    <h5 className="fw-bold">{event.title}</h5>
+
+                    <p className="text-muted mb-1">
+                      📅{" "}
+                      {new Date(event.date).toLocaleDateString("id-ID", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </p>
+
                     <p className="text-muted mb-1">📍 {event.location}</p>
 
                     <span
@@ -127,9 +139,20 @@ if (Array.isArray(attended)) {
                       {event.status}
                     </span>
 
-                    {/* PRESENSI BUTTON */}
                     {sudahPresensi ? (
-                      <button className="btn btn-success btn-sm mt-3 w-100" disabled>
+                      <button
+                        className="w-100 mt-3"
+                        style={{
+                          height: "45px",
+                          borderRadius: "12px",
+                          fontWeight: "600",
+                          background: "gray",
+                          color: "white",
+                          border: "none",
+                          cursor: "default",
+                        }}
+                        disabled
+                      >
                         ✔ Sudah Presensi
                       </button>
                     ) : (
@@ -139,7 +162,27 @@ if (Array.isArray(attended)) {
                             state: { eventId: event.id },
                           })
                         }
-                        className="btn btn-outline-primary btn-sm mt-3 w-100"
+                        className="w-100 mt-3"
+                        style={{
+                          height: "45px",
+                          borderRadius: "12px",
+                          fontWeight: "600",
+                          color: "white",
+                          background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                          border: "none",
+                          boxShadow: "0 4px 12px rgba(139,92,246,0.4)",
+                          transition: "0.25s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background =
+                            "linear-gradient(135deg, #2563eb, #7c3aed)";
+                          e.target.style.transform = "translateY(-2px)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background =
+                            "linear-gradient(135deg, #3b82f6, #8b5cf6)";
+                          e.target.style.transform = "translateY(0)";
+                        }}
                       >
                         📸 Presensi
                       </button>
@@ -147,7 +190,27 @@ if (Array.isArray(attended)) {
 
                     <button
                       onClick={() => handleCancel(event.id)}
-                      className="btn btn-outline-danger btn-sm mt-2 w-100"
+                      className="w-100 mt-2"
+                      style={{
+                        height: "45px",
+                        borderRadius: "12px",
+                        fontWeight: "600",
+                        color: "white",
+                        background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                        border: "none",
+                        boxShadow: "0 4px 12px rgba(220,38,38,0.4)",
+                        transition: "0.25s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.background =
+                          "linear-gradient(135deg, #b91c1c, #991b1b)";
+                        e.target.style.transform = "translateY(-2px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.background =
+                          "linear-gradient(135deg, #ef4444, #dc2626)";
+                        e.target.style.transform = "translateY(0)";
+                      }}
                     >
                       ❌ Batal Ikut
                     </button>

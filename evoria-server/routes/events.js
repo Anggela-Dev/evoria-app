@@ -25,7 +25,7 @@ const getAdminId = (req, res, next) => {
 // Ambil semua event untuk student (publik)
 router.get("/public/all", (req, res) => {
   const sql = `
-    SELECT id, title, description, location, date, capacity,token
+    SELECT id, title, description, location, category, date, capacity,token
     FROM events 
     ORDER BY date ASC
   `;
@@ -150,6 +150,7 @@ router.post("/", getAdminId, (req, res) => {
     title,
     description,
     location,
+    category,
     date,
     capacity,
     start_time,
@@ -161,10 +162,10 @@ router.post("/", getAdminId, (req, res) => {
 
   const sql = `
     INSERT INTO events (
-      title, description, location, date, capacity, created_by,
+      title, description, location,category, date, capacity, created_by,
       start_time, end_time, token
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(
@@ -173,12 +174,14 @@ router.post("/", getAdminId, (req, res) => {
       title,
       description,
       location,
+      category || null,
       date,
       capacity,
       adminId,
       start_time || null,
       end_time || null,
       token,
+      
     ],
     (err, result) => {
       if (err) {
@@ -200,17 +203,17 @@ router.post("/", getAdminId, (req, res) => {
 router.put("/:id", getAdminId, (req, res) => {
   const { id } = req.params;
   const adminId = req.adminId;
-  const { title, description, location, date, capacity } = req.body;
+  const { title, description, location, category, date, capacity } = req.body;
 
   const sql = `
     UPDATE events
-    SET title=?, description=?, location=?, date=?, capacity=?
+    SET title=?, description=?, location=?, category=?, date=?, capacity=?
     WHERE id=? AND created_by=?
   `;
 
   db.query(
     sql,
-    [title, description, location, date, capacity, id, adminId],
+    [title, description, location, category||null, date, capacity,  id, adminId],
     (err, result) => {
       if (err)
         return res

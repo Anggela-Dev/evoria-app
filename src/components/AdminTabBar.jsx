@@ -11,16 +11,23 @@ function AdminTabBar({ setUser }) {
 
   return (
     <nav className="tabbar">
-      <NavLink to="/admin" className="tab-item"> 
-      📊 <span>dashboard</span>
+      <NavLink 
+        to="/admin" 
+        className="tab-item"
+      >
+        📊 <span>Dashboard</span>
       </NavLink>
-      <NavLink to="/admin/events" className="tab-item">
+
+      <NavLink 
+        to="/admin/events" 
+        className="tab-item"
+      >
         📅 <span>Events</span>
       </NavLink>
+
       <button
         onClick={handleLogout}
-        className="tab-item btn text-danger fw-semibold"
-        style={{ border: "none", background: "transparent" }}
+        className="tab-item logout-btn"
       >
         🚪 <span>Logout</span>
       </button>

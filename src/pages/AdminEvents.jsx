@@ -35,10 +35,19 @@ function AdminEvents() {
 
   useEffect(() => { fetchEvents(); }, []);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Kategori yang dipilih:", form.category); // << ini
+    const payload = { ...form, category: form.category || null };
+    if (!form.category) {
+      alert("Kategori wajib dipilih!");
+      return;
+    }
 
     const method = editId ? "PUT" : "POST";
     const url = editId
@@ -52,14 +61,17 @@ function AdminEvents() {
         body: JSON.stringify(form),
       });
 
-      alert((await res.json()).message || "Berhasil!");
+      const data = await res.json();
+      alert(data.message || "Berhasil!");
       setForm({
         title: "", date: "", start_time: "", end_time: "",
         location: "", category: "", capacity: "", description: "",
       });
       setEditId(null);
       fetchEvents();
-    } catch (err) { console.error("❌ Error save:", err); }
+    } catch (err) {
+      console.error("❌ Error save:", err);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -74,20 +86,23 @@ function AdminEvents() {
   const handleEdit = (ev) => {
     setEditId(ev.id);
     setForm({
-      title: ev.title, date: ev.date,
-      start_time: ev.start_time, end_time: ev.end_time || "",
-      location: ev.location, category: ev.category,
-      capacity: ev.capacity, description: ev.description,
+      title: ev.title || "",
+      date: ev.date || "",
+      start_time: ev.start_time || "",
+      end_time: ev.end_time || "",
+      location: ev.location || "",
+      category: ev.category || "", // <- jangan biarkan null
+      capacity: ev.capacity || "",
+      description: ev.description || "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <div className="container py-3">
-
       <h2 className="fw-bold text-center mb-4">📅 Manage Event</h2>
 
-      {/* ================= FORM ================= */}
+      {/* FORM */}
       <form
         onSubmit={handleSubmit}
         className="p-3 border rounded bg-light shadow-sm mb-4"
@@ -97,7 +112,6 @@ function AdminEvents() {
           {editId ? "✏️ Edit Event" : "➕ Tambah Event"}
         </h5>
 
-        {/* INPUT GRID RESPONSIVE */}
         <div className="row g-3">
           <div className="col-12">
             <input
@@ -123,23 +137,23 @@ function AdminEvents() {
           </div>
 
           <div className="col-6 col-md-4">
-            <input type="number" name="capacity"
-              placeholder="Kapasitas" className="form-control"
-              required value={form.capacity} onChange={handleChange} />
+            <input type="number" name="capacity" placeholder="Kapasitas"
+              className="form-control" required value={form.capacity} onChange={handleChange} />
           </div>
 
           <div className="col-12 col-md-8">
             <input name="location" placeholder="Lokasi Event"
-              className="form-control" required
-              value={form.location} onChange={handleChange} />
+              className="form-control" required value={form.location} onChange={handleChange} />
           </div>
 
           <div className="col-12 col-md-6">
             <select name="category" className="form-select"
               required value={form.category} onChange={handleChange}>
               <option value="">Pilih Kategori</option>
-              <option>Seminar</option><option>Workshop</option>
-              <option>Kompetisi</option><option>Hiburan</option>
+              <option value="Seminar">Seminar</option>
+              <option value="Workshop">Workshop</option>
+              <option value="Kompetisi">Kompetisi</option>
+              <option value="Hiburan">Hiburan</option>
             </select>
           </div>
 
@@ -154,14 +168,20 @@ function AdminEvents() {
           <button className="btn btn-primary">{editId ? "Simpan" : "Tambah"}</button>
           {editId && (
             <button type="button" className="btn btn-secondary"
-              onClick={() => { setEditId(null); setForm({title:"",date:"",start_time:"",end_time:"",location:"",category:"",capacity:"",description:""}); }}>
+              onClick={() => {
+                setEditId(null);
+                setForm({
+                  title:"", date:"", start_time:"", end_time:"",
+                  location:"", category:"", capacity:"", description:""
+                });
+              }}>
               Batal
             </button>
           )}
         </div>
       </form>
 
-      {/* ================= TABLE ================= */}
+      {/* TABLE */}
       <div className="table-responsive shadow-sm rounded overflow-x-auto">
         <table className="table table-striped align-middle text-center">
           <thead className="table-primary">
@@ -170,16 +190,15 @@ function AdminEvents() {
               <th>Lokasi</th><th>Kategori</th><th>Kuota</th><th>QR</th><th>Aksi</th>
             </tr>
           </thead>
-
           <tbody>
             {events.length ? events.map((ev,i)=>(
               <tr key={ev.id}>
                 <td>{i+1}</td>
                 <td className="text-break">{ev.title}</td>
                 <td>{new Date(ev.date).toLocaleDateString('id-ID')}</td>
-                <td>{ev.start_time.slice(0,5)} {ev.end_time && (" - "+ev.end_time.slice(0,5))}</td>
+                <td>{ev.start_time.slice(0,5)}{ev.end_time && (" - "+ev.end_time.slice(0,5))}</td>
                 <td className="text-break">{ev.location}</td>
-                <td>{ev.category}</td><td>{ev.capacity}</td>
+                <td>{ev.category || "-"}</td><td>{ev.capacity}</td>
 
                 <td>
                   <button className="btn btn-dark btn-sm"
@@ -207,7 +226,7 @@ function AdminEvents() {
         </table>
       </div>
 
-      {/* ================= QR MODAL ================= */}
+      {/* QR MODAL */}
       {qrEventId && (
         <div className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75
                         d-flex justify-content-center align-items-center"
