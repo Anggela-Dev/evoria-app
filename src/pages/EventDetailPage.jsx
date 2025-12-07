@@ -50,12 +50,16 @@ function EventDetailPage() {
     year: "numeric",
   });
 
-  const formattedTime = event.time
-    ? new Date(event.time).toLocaleTimeString("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "Waktu belum ditentukan";
+  const formattedStart = event.start_time
+  ? event.start_time.slice(0, 5) // Format HH:MM
+  : "-";
+
+const formattedEnd = event.end_time
+  ? event.end_time.slice(0, 5)
+  : "-";
+
+const formattedTime = `${formattedStart} - ${formattedEnd}`;
+
 
   return (
     <div className="container my-5 d-flex justify-content-center">
